@@ -3,7 +3,10 @@ var router = express.Router();
 
 var administrator = require('../controllers/administrator-controller')
 
+router.get ('/signBallot', function(req, res, next) { res.render('administrator-sign', {user:req.session.user}); });
 router.post('/signBallot', administrator.signBallot);
+
+router.get('/signatures/:eid', administrator.publishSignatures);
 
 router.get('/', function(req, res, next) {
     console.log("Admin hi");

@@ -6,11 +6,14 @@ var electionSchema = mongoose.Schema({
     stage : {type: String, enum:["pending", "running", "ended"]},
     voters   : [{
         kerberos      : {type: String, required: true},
-        blindBallot   : {type: String}
+        blindBallot   : {
+            blindBallot     : {type: String},
+            adminSignature  : {type: String}
+        }
     }],
     ballots  : [{
         ballot          : {type: String},
-        adminSignature  : {type: String, required: true}
+        adminSignature  : {type: String}
     }]
 });
 
@@ -24,7 +27,7 @@ electionSchema.methods.userCanVote = function(user) {
     if (this.stage != "running") return false;
 
     return (this.voters.filter(function(v) {
-        if (v.blindBallot) return false; // user already voted
+        if (v.blindBallot.blindBallot) return false; // user already voted
         return (v.kerberos == user)
     }).length > 0);
 };
@@ -33,12 +36,28 @@ electionSchema.methods.userIsOrganizer = function(user) {
     return this.organizer == user;
 };
 
-electionSchema.methods.addBlindBallot = function(user, blindBallot) {
+electionSchema.methods.addBlindBallot = function(user, blindBallot, signature, cb) {
     var voter = this.voters.filter(function(v) {
         return v.kerberos == user;
     });
 
-    voter.blindBallot = blindBallot;
+    var index = 0;
+    console.log(this.voters);
+    console.log(user);
+
+    while(this.voters[index].kerberos != user){
+        index++;
+        if (index >= this.voters.length) {
+            console.log("User can't vote"); // Code should check for this earlier but just in case
+            cb("NOT_REGISTERED");
+            break;
+        }
+    }
+
+    this.voters[index].blindBallot = {
+        blindBallot : blindBallot,
+        adminSignature : signature
+    };
 
     this.save(cb);
 }
@@ -79,14 +98,24 @@ electionSchema.methods.isClosed = function() {
 ///// Statics /////
 
 electionSchema.statics.getElection = function(election, cb) {
-    electionSchema.findOne({_id:election}, cb);
+    mongoose.model('Election').findOne({_id:election}, cb);
 };
 
-electionSchema.statics.createElection = function(organizer, voters, cb) {
+electionSchema.statics.createElection = function(organizer, rawVoters, cb) {
+    var voters = rawVoters.map(function(v) {
+        return {
+            kerberos : v,
+        };
+    });
+
+    console.log(voters);
+    console.log(organizer);
+
     mongoose.model('Election').create({
         organizer : organizer,
         voters    : voters,
-        stage     : "pending"
+        stage     : "pending",
+        ballots   : []
     }, cb);
 };
 

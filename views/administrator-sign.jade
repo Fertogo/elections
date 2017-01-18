@@ -1,0 +1,24 @@
+extends layout
+
+block content
+  h1 Submit Ballot to Admin for signature
+  p
+    | Your Kerberos: #{user.kerberos}
+  p
+    | Your Name    : #{user.name}
+
+  hr
+
+  form(method="post")
+    label Election ID:
+    input(name="election" type="text")
+
+    label Blind Ballot:
+    input(name="blindBallot" type="text")
+
+    button(type="submit") Submit Ballot
+
+
+
+
+

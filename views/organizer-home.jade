@@ -1,0 +1,24 @@
+extends layout
+
+block content
+  h1 Organizer Panel
+  p
+    | Your Kerberos: #{user.kerberos}
+  p
+    | Your Name    : #{user.name}
+
+
+  a(href="createElection") Create Election
+  for election in elections
+    hr
+    p Election: #{election._id}
+    p Stage: #{election.stage}
+
+    if election.stage != "ended"
+        form(method="post" action="endElection")
+            input(hidden name="electionID" value="#{election._id}")
+            button(type="submit") End Election
+
+
+
+
