@@ -3,12 +3,23 @@ var path = require('path');
 var favicon = require('serve-favicon');
 var logger = require('morgan');
 var cookieParser = require('cookie-parser');
+var cookieSession = require('cookie-session');
 var bodyParser = require('body-parser');
 
 var routes = require('./routes/index');
 var users = require('./routes/users');
+var electionAdmin = require('./routes/administrator');
+
+var auth = require('./mit-cert-auth/auth.js').authenticate;
+
+
 
 var app = express();
+
+var mongoose = require('mongoose');
+var DB_URI = process.env.UAP_URI || 'mongodb://localhost:27017/uap';
+db = mongoose.connect(DB_URI);
+
 
 // view engine setup
 app.set('views', path.join(__dirname, 'views'));
@@ -22,8 +33,13 @@ app.use(bodyParser.urlencoded({ extended: false }));
 app.use(cookieParser());
 app.use(express.static(path.join(__dirname, 'public')));
 
+// enable cookie sessions (to be able to store key in req.session)
+app.use(cookieSession({secret: "cookieSecret"}))
+
 app.use('/', routes);
 app.use('/users', users);
+app.use('/administrator', auth);
+app.use('/administrator', electionAdmin);
 
 // catch 404 and forward to error handler
 app.use(function(req, res, next) {
