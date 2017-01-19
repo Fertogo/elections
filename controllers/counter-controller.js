@@ -15,25 +15,36 @@ counter.collectBallot = function(req, res, next) {
         if (!e) return res.status(404);
 
         // Check signature of ballot using current election's admin key
-        if (!administrator.verifySignature(ballot, signature)) {
-            console.log("Signature not valid for given ballot");
-            return res.status(401).send("INVALID_SIGNATURE");
-        }
-
-        // Check for valid ballot
-        if (! verifyBallot(ballot)) return res.send("Invalid ballot");
-
-
-        // Add ballot to list
-        e.addBallot(ballot, signature, function(err) {
+        administrator.verifySignature(ballot, signature, function(err, signatureValid) {
             if (err) return next(err);
-            res.send("BALLOT_COLLECTED");
+            if (!signatureValid) {
+                console.log("Signature not valid for given ballot");
+                return res.status(401).send("INVALID_SIGNATURE");
+            }
+
+            // Check for valid ballot
+            if (! verifyBallot(ballot)) return res.send("Invalid ballot");
+
+
+            // Add ballot to list
+            e.addBallot(ballot, signature, function(err) {
+                if (err) return next(err);
+                res.send("BALLOT_COLLECTED");
+            });
         });
+
 
     });
 
 
 };
+
+counter.tempSign = function(req, res, next) {
+    console.log("counter temp sign");
+    administrator.tempSign(req.body.message, function(err, signature) {
+        res.send(signature);
+    });
+}
 
 function verifyBallot(ballot) {
     // TODO

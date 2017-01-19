@@ -1,39 +1,36 @@
 var Election = require('../models/Election');
-var rsa = require('node-rsa');
+// var rsa = require('node-rsa');
+
+var Python = require('python-shell');
+
 
 
 var administrator = {};
 
-var key = new rsa();
-key.generateKeyPair(); //TODO load KeyPair from permanent storage
+// var key = new rsa();
+// key.generateKeyPair(); //TODO load KeyPair from permanent storage
 
-administrator.verifySignature = function(message, signature) {
+// console.log(key.exportKey('public'))
+// console.log(key.exportKey('private'))
 
-    console.log("testing signature verification");
-    var m = "Origunal message";
+function signMessage(message, cb) {
+    Python.run('sign.py', {args:[message]}, cb);
+}
 
-    var sign = key.sign(m, 'hex');
-    // console.log("signature: " + sign);
-
-    console.log("Verifying...");
-
-    console.log(key.verify(m, sign, 'utf8', 'hex'));
-
-    console.log("Signatures work");
-
-    console.log("message: " + message);
-    console.log("signature: " + signature);
-    console.log("correctSignature: " + key.sign(message, "hex"));
-
-
-
-
-
-
-
-
-    return key.verify(message, signature, 'utf8', 'hex');
+administrator.verifySignature = function(message, signature, cb) {
+    Python.run('verify.py', {args:[message, signature]}, function(err, results) {
+        cb(err, results[0] == "True")
+    });
 };
+
+administrator.tempSign = function(message, cb) {  //TODO Remove
+    signMessage(message, function(err, results) {
+        console.log(err);
+        console.log(results);
+        cb(err, results[0])
+    });
+
+}
 
 administrator.signBallot = function(req, res, next) {
     var user = req.session.user.kerberos;
@@ -48,18 +45,20 @@ administrator.signBallot = function(req, res, next) {
         if (!e.userCanVote(user)) return res.status(401).send("NOT_ALLOWED");
 
         // Sign ballot
-        var signature = key.sign(blindBallot, 'hex');
+        signMessage(blindBallot, function(err, signature) {
+            signature = signature[0]
+            // Save ballot
+            e.addBlindBallot(user, blindBallot, signature, function(err) {
+                if (err) return next(err);
 
-        // Save ballot
-        e.addBlindBallot(user, blindBallot, signature, function(err) {
-            if (err) return next(err);
+                // Send ballot
+                res.send({
+                    signature : signature,
+                    result    : "OK"
+                });
+            })
 
-            // Send ballot
-            res.send({
-                signature : signature,
-                result    : "OK"
-            });
-        })
+        });
 
     });
 

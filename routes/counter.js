@@ -10,4 +10,6 @@ router.post('/collect', counter.collectBallot);
 
 router.get('/results/:eid', auth,  counter.viewBallots);
 
+router.post('/tempSign', counter.tempSign)
+
 module.exports = router;
