@@ -5,7 +5,7 @@ from random import SystemRandom
 import requests
 def getSignature(message):
     # print message
-    r = requests.post('http://localhost:3000/counter/tempSign', data={'message':message})
+    r = requests.post('http://localhost:3000/counter/tempSign', data={'message':message, "eid":"58826ab1b754ca9dee780e93"})
     return r.text
 
 
@@ -17,10 +17,8 @@ def readFromFile(filename):
     file.close()
     return data
 
-pub = RSA.importKey(readFromFile('pk.pub'))
+pub = RSA.importKey(readFromFile('test.pub'))
 
-# print pub.exportKey()
-# print priv.exportKey()
 
 
 
@@ -30,41 +28,46 @@ pub = RSA.importKey(readFromFile('pk.pub'))
 r = SystemRandom().randrange(pub.n >> 10, pub.n)
 msg = "my message" * 50 # large message (larger than the modulus)
 
+print "Original Message: " + msg
+
 # hash message so that messages of arbitrary length can be signed
 hash = SHA256.new()
 hash.update(msg)
 msgDigest = hash.hexdigest()
 
+print "Hashed Message: " + msgDigest
+
+
 # user computes
 msg_blinded = pub.blind(msgDigest, r)
 
-# print ("Original")
-# print(msgDigest)
+
 
 
 # Convert to hex
 msg_blinded = ''.join(x.encode('hex') for x in msg_blinded)
+
+
+print "Blinded Message: " + msg_blinded
 # This one gets outputted ^
 
-# print ("Blinded")
-# print(msg_blinded)
-
-# msg_blinded_signature = long(getSignature(msg_blinded), 16)
 
 msg_blinded_signature = long(getSignature(msg_blinded))
+
+print "Blinded Signature: " , msg_blinded_signature
+
 
 
 # user computes
 msg_signature = pub.unblind(msg_blinded_signature, r)
 
-print type(msg_blinded_signature) # long
-print type(r)
+print "Final Signature: ", msg_signature
+
 # Someone verifies
 hash = SHA256.new()
 hash.update(msg)
 msgDigest = hash.hexdigest()
-print type(msgDigest)
-print type(msg_signature)
+
 print("Message is authentic: " + str(pub.verify(msgDigest, (msg_signature,))))
 
 

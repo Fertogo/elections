@@ -15,7 +15,7 @@ counter.collectBallot = function(req, res, next) {
         if (!e) return res.status(404);
 
         // Check signature of ballot using current election's admin key
-        administrator.verifySignature(ballot, signature, function(err, signatureValid) {
+        administrator.verifySignature(e._id, ballot, signature, function(err, signatureValid) {
             if (err) return next(err);
             if (!signatureValid) {
                 console.log("Signature not valid for given ballot");
@@ -41,7 +41,7 @@ counter.collectBallot = function(req, res, next) {
 
 counter.tempSign = function(req, res, next) {
     console.log("counter temp sign");
-    administrator.tempSign(req.body.message, function(err, signature) {
+    administrator.tempSign(req.body.message, req.body.eid,  function(err, signature) {
         res.send(signature);
     });
 }
@@ -78,10 +78,10 @@ counter.viewBallots = function(req, res, next) {
         if (!e) return res.status(404).send("ELECTION_NOT_FOUND");
 
         // Check that election is closed
-        if (!e.isClosed()) res.status(401).send("ELECTION_NOT_CLOSED");
+        if (!e.isClosed()) return res.status(401).send("ELECTION_NOT_CLOSED");
 
         // Check that user is in election
-        if (!e.userInElection(user)) res.status(401).send("USER_NOT_IN_ELECTION");
+        if (!e.userInElection(user)) return res.status(401).send("USER_NOT_IN_ELECTION");
 
         // Send back the ballots
         res.json(e.ballots);

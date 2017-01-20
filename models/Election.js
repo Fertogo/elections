@@ -1,4 +1,7 @@
 var mongoose = require('mongoose');
+var rsa = require('node-rsa');
+var fs = require('fs');
+
 
 
 var electionSchema = mongoose.Schema({
@@ -111,12 +114,25 @@ electionSchema.statics.createElection = function(organizer, rawVoters, cb) {
     console.log(voters);
     console.log(organizer);
 
+
     mongoose.model('Election').create({
         organizer : organizer,
         voters    : voters,
         stage     : "pending",
         ballots   : []
-    }, cb);
+    }, function(err, e) {
+        // Create administrator keys
+        generateElectionKeys(e._id);
+        cb(err, e);
+    });
 };
+
+function generateElectionKeys(id) {
+    var key = new rsa();
+    key.generateKeyPair();
+
+    fs.writeFileSync("keystore/" + id + ".pub", key.exportKey('public'));
+    fs.writeFileSync("keystore/" + id, key.exportKey('private'));
+}
 
 module.exports = mongoose.model('Election', electionSchema)

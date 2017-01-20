@@ -1,35 +1,48 @@
 var Election = require('../models/Election');
-// var rsa = require('node-rsa');
 
 var Python = require('python-shell');
+
+var fs = require('fs');
 
 
 
 var administrator = {};
 
-// var key = new rsa();
-// key.generateKeyPair(); //TODO load KeyPair from permanent storage
 
-// console.log(key.exportKey('public'))
-// console.log(key.exportKey('private'))
-
-function signMessage(message, cb) {
-    Python.run('sign.py', {args:[message]}, cb);
+function signMessage(id, message, cb) {
+    Python.run('sign.py', {args:[id, message]}, cb);
 }
 
-administrator.verifySignature = function(message, signature, cb) {
-    Python.run('verify.py', {args:[message, signature]}, function(err, results) {
+administrator.verifySignature = function(id, message, signature, cb) {
+    Python.run('verify.py', {args:[id, message, signature]}, function(err, results) {
         cb(err, results[0] == "True")
     });
 };
 
-administrator.tempSign = function(message, cb) {  //TODO Remove
-    signMessage(message, function(err, results) {
+administrator.tempSign = function(message, id, cb) {  //TODO Remove
+    signMessage(id, message, function(err, results) {
         console.log(err);
         console.log(results);
         cb(err, results[0])
     });
 
+}
+
+administrator.getPublicKey = function(req, res, next) {
+    var election = req.params.eid;
+    var user     = req.session.user.kerberos;
+
+    Election.getElection(election, function(err, e){
+        if (err) return next(err);
+        if (!e) return res.status(404).send("ELECTION_NOT_FOUND");
+        if (!e.userInElection(user)) return res.status(401).send("USER_NOT_IN_ELECTION");
+
+        res.header('Content-Disposition', 'attachment; filename="key.pub"');
+        fs.readFile('keystore/'+ e._id + ".pub", function(err, data) {
+            if (err) return next(err);
+            res.send(data);
+        });
+    });
 }
 
 administrator.signBallot = function(req, res, next) {
@@ -45,7 +58,7 @@ administrator.signBallot = function(req, res, next) {
         if (!e.userCanVote(user)) return res.status(401).send("NOT_ALLOWED");
 
         // Sign ballot
-        signMessage(blindBallot, function(err, signature) {
+        signMessage(e._id, blindBallot, function(err, signature) {
             signature = signature[0]
             // Save ballot
             e.addBlindBallot(user, blindBallot, signature, function(err) {

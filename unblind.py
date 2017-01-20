@@ -15,7 +15,7 @@ def readFromFile(filename):
     file.close()
     return data
 
-pub = RSA.importKey(readFromFile('pk.pub'))
+pub= RSA.importKey(readFromFile('key.pub'))
 
 
 r = (long) (readFromFile('r')[0])
@@ -29,7 +29,6 @@ print "blinded signature: " , msg_blinded_signature
 
 #SA computes
 # msg_blinded_signature = ''.join(str(bytearray.fromhex(msg_blinded_signature)))
-print type(msg_blinded_signature)
 
 # user computes
 msg_signature = pub.unblind(msg_blinded_signature, r)
@@ -41,14 +40,11 @@ msg = raw_input("What was the original message? ")
 print "got: " + msg
 
 
-print type(msg_blinded_signature) # str but should be long
-print type(r)
 
 # Someone verifies
 hash = SHA256.new()
 hash.update(msg)
 msgDigest = hash.hexdigest()
-print type(msgDigest)
-print type(msg_signature)
+
 print("Message is authentic: " + str(pub.verify(msgDigest, (msg_signature,))))
 

@@ -7,6 +7,7 @@ router.get ('/signBallot', function(req, res, next) { res.render('administrator-
 router.post('/signBallot', administrator.signBallot);
 
 router.get('/signatures/:eid', administrator.publishSignatures);
+router.get('/publicKey/:eid', administrator.getPublicKey);
 
 router.get('/', function(req, res, next) {
     console.log("Admin hi");

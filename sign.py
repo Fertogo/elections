@@ -2,11 +2,10 @@ import sys
 from Crypto.PublicKey import RSA
 
 
+electionID = sys.argv[1]
+message = sys.argv[2]
 
-message = sys.argv[1]
 message= ''.join(str(bytearray.fromhex(message)))
-
-
 
 def readFromFile(filename):
     file = open(filename, 'r')
@@ -14,8 +13,7 @@ def readFromFile(filename):
     file.close()
     return data
 
-pub = RSA.importKey(readFromFile('pk.pub'))
-priv = RSA.importKey(readFromFile('pk'))
+priv = RSA.importKey(readFromFile("keystore/" + electionID))
 
 msg_blinded_signature = priv.sign(message, 0)[0]
 

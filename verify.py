@@ -3,11 +3,10 @@ from Crypto.PublicKey import RSA
 from Crypto.Hash import SHA256
 
 
+electionID = sys.argv[1]
+message = sys.argv[2]
+signature = sys.argv[3]
 
-message = sys.argv[1]
-signature = sys.argv[2]
-
-# message= ''.join(str(bytearray.fromhex(message)))
 signature= long(signature)
 
 
@@ -17,8 +16,7 @@ def readFromFile(filename):
     file.close()
     return data
 
-pub = RSA.importKey(readFromFile('pk.pub'))
-priv = RSA.importKey(readFromFile('pk'))
+pub = RSA.importKey(readFromFile('keystore/' + electionID))
 
 hash = SHA256.new()
 hash.update(message)

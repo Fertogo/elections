@@ -21,7 +21,12 @@ def readFromFile(filename):
 print("Start")
 
 
-pub = RSA.importKey(readFromFile('pk.pub'))
+# key = RSA.generate(2048)
+# pub = key.publickey()
+# saveToFile("pk.pub", pub.exportKey())
+
+pub= RSA.importKey(readFromFile('key.pub'))
+
 
 print pub.exportKey()
 
