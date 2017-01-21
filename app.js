@@ -11,6 +11,7 @@ var users = require('./routes/users');
 var electionAdmin = require('./routes/administrator');
 var organizer = require('./routes/organizer');
 var counter = require('./routes/counter');
+var election = require('./routes/election');
 
 
 var auth = require('./mit-cert-auth/auth.js').authenticate;
@@ -46,6 +47,9 @@ app.use('/administrator', electionAdmin);
 app.use('/organizer', auth);
 app.use('/organizer', organizer);
 app.use('/counter', counter);
+
+app.use('/election' , auth);
+app.use('/election' , election);
 
 
 // catch 404 and forward to error handler

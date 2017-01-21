@@ -1,0 +1,29 @@
+extends layout
+
+block content
+  h1 Election
+
+  p State: #{election.state}
+
+  p Organized by: #{election.organizer}
+
+  p Total Voters: #{election.voters.length}
+
+  p Administrator Public Key
+  pre
+    #{election.adminKey}
+
+  a(href="/administrator/publicKey/#{election.id}")
+      button
+        | Download public key
+
+
+  hr
+
+  p Step 1:
+      a(href="/administrator/signBallot?eid=#{election.id}")
+        | Get ballot signed
+  p Step 2:
+      a(href="/counter/collect?eid=#{election.id}")
+        | Submit signed ballot
+
