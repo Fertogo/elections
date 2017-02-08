@@ -8,17 +8,43 @@ block content
     | Your Name    : #{user.name}
 
 
-  a(href="createElection") Create Election
-  for election in elections
-    hr
-    p Election: #{election._id}
-    p Stage: #{election.stage}
 
-    if election.stage != "ended"
-        form(method="post" action="endElection")
-            input(hidden name="electionID" value="#{election._id}")
-            button(type="submit") End Election
 
+  h4 Your Elections
+
+  table.ui-full-width
+    thead
+      th electionID
+      th election status
+      th # registered
+      th # votes
+      th actions
+    tbody
+
+
+      for election in elections
+        tr
+          td
+            a(href="/election/#{election._id}") #{election._id}
+          td #{election.stage}
+          td #{election.voters.length}
+          td #{election.ballots.length}
+          td
+            if election.stage != "ended"
+                form(method="post" action="endElection")
+                    input(hidden name="electionID" value="#{election._id}")
+                    button.button(type="submit") end
+            else
+              a(href="/counter/results/#{election._id}")
+                button.button
+                  | results
+
+
+
+
+  a(href="/organizer/createElection")
+    button.button-primary
+      | Create Election
 
 
 

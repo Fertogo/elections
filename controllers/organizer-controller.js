@@ -14,10 +14,7 @@ organizer.createElection = function(req, res, next) {
         e.startElection(function(err) {
             if (err) return next(err);
 
-            res.json({
-                "result" : "ELECTION_CREATED",
-                "electionID" : e._id,
-            });
+            res.redirect("/organizer");
         })
     })
 };

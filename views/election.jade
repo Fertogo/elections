@@ -3,13 +3,12 @@ extends layout
 block content
   h1 Election
 
-  p State: #{election.state}
-
   p Organized by: #{election.organizer}
 
   p Total Voters: #{election.voters.length}
 
-  p Administrator Public Key
+  p Administrator Public Key:
+
   pre
     #{election.adminKey}
 
@@ -20,10 +19,18 @@ block content
 
   hr
 
-  p Step 1:
-      a(href="/administrator/signBallot?eid=#{election.id}")
-        | Get ballot signed
-  p Step 2:
-      a(href="/counter/collect?eid=#{election.id}")
-        | Submit signed ballot
+  if (election.stage == "ended")
+    a(href="/counter/results/#{election.id}")
+        button
+          | See election results
+
+  else
+    h4 Submit a vote
+
+    h5 Step 1:
+        a(href="/administrator/signBallot?eid=#{election.id}")
+          | Get ballot signed
+    h5 Step 2:
+        a(href="/counter/collect?eid=#{election.id}")
+          | Submit signed ballot
 

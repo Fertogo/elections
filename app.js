@@ -7,7 +7,6 @@ var cookieSession = require('cookie-session');
 var bodyParser = require('body-parser');
 
 var routes = require('./routes/index');
-var users = require('./routes/users');
 var electionAdmin = require('./routes/administrator');
 var organizer = require('./routes/organizer');
 var counter = require('./routes/counter');
@@ -40,7 +39,6 @@ app.use(express.static(path.join(__dirname, 'public')));
 app.use(cookieSession({secret: "cookieSecret"}))
 
 app.use('/', routes);
-app.use('/users', users);
 app.use('/administrator', auth);
 app.use('/administrator', electionAdmin);
 

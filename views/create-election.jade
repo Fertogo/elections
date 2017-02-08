@@ -4,6 +4,7 @@ block content
   h1 Create Election
   form(method="post")
     label
-        | Kerberos's that can vote:
-    input(type="text" name="voters")
-    button(type="submit") Create Election
+        | Kerberos's that can vote: (comma separated)
+    input(type="text" name="voters" style="width:300px")
+    br
+    button.button-primary(type="submit") Create Election

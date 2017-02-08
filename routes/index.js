@@ -8,11 +8,7 @@ var auth = require('../mit-cert-auth/auth.js')
 
 /* GET home page. */
 router.get('/', function(req, res, next) {
-
-
-
-
-  res.render('index', { title: 'Express' });
+    res.redirect("/organizer");
 });
 
 router.get('/login', auth.login);
