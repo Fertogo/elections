@@ -31,7 +31,7 @@ block content
           td #{election.ballots.length}
           td
             if election.stage != "ended"
-                form(method="post" action="endElection")
+                form(method="post" action="/organizer/endElection")
                     input(hidden name="electionID" value="#{election._id}")
                     button.button(type="submit") end
             else

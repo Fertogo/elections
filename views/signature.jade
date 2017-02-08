@@ -1,0 +1,18 @@
+extends layout
+
+block content
+  h1 Admin has signed your ballot
+
+  h3 Signature
+  p(style="width:400px; word-wrap:break-word")
+    !{signature}
+
+  p (open in incognito for anonymity)
+  a(href="/counter/collect?eid=#{election}")
+    | Submit to counter
+
+
+
+
+
+

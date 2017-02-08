@@ -1,0 +1,7 @@
+{
+    "loginUrl": "https://uapelections.herokuapp.com/login",
+    "scriptsUsername": "trujano",
+    "scriptsPath": "/",
+    "authSecret": "randomStringOfChars",
+    "cookieSecret": "anotherRandomString"
+}

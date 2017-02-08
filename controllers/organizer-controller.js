@@ -36,7 +36,7 @@ organizer.endElection = function(req, res, next) {
         // End the election
         e.endElection(function(err){
             if (err) return next(err);
-            res.send("ELECTION_ENDED");
+            res.redirect("/organizer");
         });
     });
 

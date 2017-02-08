@@ -15,10 +15,10 @@ def readFromFile(filename):
     file = open(filename, 'r')
     data = file.readlines()
     file.close()
-    return ''.join(data)
+    return ''.join(data).replace(">","").replace("<","")
 
 
-print("Start")
+print("Blinding ballot...")
 
 
 # key = RSA.generate(2048)
@@ -28,7 +28,7 @@ print("Start")
 pub= RSA.importKey(readFromFile('key.pub'))
 
 
-print pub.exportKey()
+# print pub.exportKey()
 
 
 ## Protocol: Blind signature ##
@@ -37,7 +37,6 @@ print pub.exportKey()
 r = SystemRandom().randrange(pub.n >> 10, pub.n)
 saveToFile('r', str(r));
 
-# msg = "my message" * 50 # large message (larger than the modulus)
 msg = sys.argv[1]
 
 # hash message so that messages of arbitrary length can be signed
@@ -45,24 +44,23 @@ hash = SHA256.new()
 hash.update(msg)
 msgDigest = hash.hexdigest()
 
-print "Original Message"
+print "Original Ballot"
 print msg
 
-# user computes
 msg_blinded = pub.blind(msgDigest, r)
 
-print ("Message Hash")
-print(msgDigest)
+# print ("Message Hash")
+# print(msgDigest)
 
 
 # Convert to hex
 msg_blinded = ''.join(x.encode('hex') for x in msg_blinded)
 # This one gets outputted ^
 
-print ("Blinded")
+print ("Blinded Ballot:")
 print(msg_blinded)
 
-print "r: " + str(r)
+# print "r: " + str(r)
 
 
 

@@ -59,16 +59,15 @@ administrator.signBallot = function(req, res, next) {
 
         // Sign ballot
         signMessage(e._id, blindBallot, function(err, signature) {
+            if (err) return next(err);
+
             signature = signature[0]
             // Save ballot
             e.addBlindBallot(user, blindBallot, signature, function(err) {
                 if (err) return next(err);
 
                 // Send ballot
-                res.send({
-                    signature : signature,
-                    result    : "OK"
-                });
+                res.render("signature", {signature:signature, election:e._id});
             })
 
         });

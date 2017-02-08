@@ -13,12 +13,13 @@ def readFromFile(filename):
     file = open(filename, 'r')
     data = file.readlines()
     file.close()
-    return data
+    return ''.join(data).replace(">","").replace("<","")
+
 
 pub= RSA.importKey(readFromFile('key.pub'))
 
 
-r = (long) (readFromFile('r')[0])
+r = (long) (readFromFile('r'))
 
 msg_blinded_signature = long(sys.argv[1])
 
@@ -33,10 +34,10 @@ print "blinded signature: " , msg_blinded_signature
 # user computes
 msg_signature = pub.unblind(msg_blinded_signature, r)
 
-print "Signature for message:"
+print "Signature for original ballot:"
 print msg_signature
 
-msg = raw_input("What was the original message? ")
+msg = raw_input("What was the original ballot? ")
 print "got: " + msg
 
 
@@ -46,5 +47,9 @@ hash = SHA256.new()
 hash.update(msg)
 msgDigest = hash.hexdigest()
 
-print("Message is authentic: " + str(pub.verify(msgDigest, (msg_signature,))))
+if (pub.verify(msgDigest, (msg_signature,))):
+    print "Signature is good. Submit signature and original ballot to the counter"
+else:
+    print "The signature is invalid. Something went wrong"
+
 
