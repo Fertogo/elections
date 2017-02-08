@@ -14,6 +14,10 @@ counter.collectBallot = function(req, res, next) {
         if (err) return next(err);
         if (!e) return res.status(404);
 
+        // Check that this ballot/signature has not been submitted before
+        if (e.ballots && e.ballots.filter(function(b) { return b.adminSignature == signature; }).length > 0)
+            res.status(401).send("SIGNATURE_ALREADY_USED");
+
         // Check signature of ballot using current election's admin key
         administrator.verifySignature(e._id, ballot, signature, function(err, signatureValid) {
             if (err) return next(err);
