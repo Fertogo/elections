@@ -1,6 +1,6 @@
 var mongoose = require('mongoose');
-var rsa = require('node-rsa');
-var fs = require('fs');
+var rsa      = require('node-rsa');
+var fs       = require('fs');
 
 
 
@@ -79,8 +79,7 @@ electionSchema.methods.getBallot = function(signature) {
 };
 
 electionSchema.methods.getResults = function() {
-    // TODO
-
+    // TODO: Add vote tallying here depending on how ballot is defined
     return this.ballots;
 };
 
@@ -111,10 +110,6 @@ electionSchema.statics.createElection = function(organizer, rawVoters, cb) {
         };
     });
 
-    console.log(voters);
-    console.log(organizer);
-
-
     mongoose.model('Election').create({
         organizer : organizer,
         voters    : voters,
@@ -133,6 +128,6 @@ function generateElectionKeys(id) {
 
     fs.writeFileSync("keystore/" + id + ".pub", key.exportKey('public'));
     fs.writeFileSync("keystore/" + id, key.exportKey('private'));
-}
+};
 
 module.exports = mongoose.model('Election', electionSchema)

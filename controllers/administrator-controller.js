@@ -1,32 +1,18 @@
 var Election = require('../models/Election');
-
-var Python = require('python-shell');
-
-var fs = require('fs');
-
-
+var Python   = require('python-shell');
+var fs       = require('fs');
 
 var administrator = {};
 
-
 function signMessage(id, message, cb) {
     Python.run('sign.py', {args:[id, message]}, cb);
-}
+};
 
 administrator.verifySignature = function(id, message, signature, cb) {
     Python.run('verify.py', {args:[id, message, signature]}, function(err, results) {
         cb(err, results[0] == "True")
     });
 };
-
-administrator.tempSign = function(message, id, cb) {  //TODO Remove
-    signMessage(id, message, function(err, results) {
-        console.log(err);
-        console.log(results);
-        cb(err, results[0])
-    });
-
-}
 
 administrator.getPublicKey = function(req, res, next) {
     var election = req.params.eid;
@@ -43,12 +29,12 @@ administrator.getPublicKey = function(req, res, next) {
             res.send(data);
         });
     });
-}
+};
 
 administrator.signBallot = function(req, res, next) {
-    var user = req.session.user.kerberos;
+    var user        = req.session.user.kerberos;
     var blindBallot = req.body.blindBallot;
-    var election = req.body.election;
+    var election    = req.body.election;
 
 
     Election.getElection(election, function(err, e) {
@@ -68,20 +54,15 @@ administrator.signBallot = function(req, res, next) {
 
                 // Send ballot
                 res.render("signature", {signature:signature, election:e._id});
-            })
-
+            });
         });
-
     });
-
-
 };
 
 
 administrator.publishSignatures = function(req, res, next) {
-    var user = req.session.user.kerberos;
+    var user     = req.session.user.kerberos;
     var election = req.params.eid;
-
 
     Election.getElection(election, function(err, e) {
         if (err) return next(err);
@@ -91,10 +72,8 @@ administrator.publishSignatures = function(req, res, next) {
             return res.status(401);
 
         // send all signatures
-        res.json(e.voters); //TODO Privacy issue?
+        res.json(e.voters);
     });
-
-
 };
 
 module.exports = administrator;

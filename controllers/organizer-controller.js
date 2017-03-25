@@ -6,8 +6,6 @@ organizer.createElection = function(req, res, next) {
     var organizer = req.session.user.kerberos;
     var voters    = req.body.voters.split(',');
 
-    console.log("Creating election with: " + voters);
-
     Election.createElection(organizer, voters, function(err, e) {
         if (err) return next(err);
 
@@ -23,8 +21,6 @@ organizer.createElection = function(req, res, next) {
 organizer.endElection = function(req, res, next) {
     var organizer  = req.session.user.kerberos;
     var electionID = req.body.electionID;
-
-    console.log("ending election: " + electionID);
 
     Election.getElection(electionID, function(err, e) {
         if (err) return next(err);

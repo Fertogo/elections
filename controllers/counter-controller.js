@@ -5,8 +5,8 @@ var administrator = require('./administrator-controller');
 var counter = {};
 
 counter.collectBallot = function(req, res, next) {
-    var election = req.body.election;
-    var ballot = req.body.ballot;
+    var election  = req.body.election;
+    var ballot    = req.body.ballot;
     var signature = req.body.signature;
 
 
@@ -29,35 +29,22 @@ counter.collectBallot = function(req, res, next) {
             // Check for valid ballot
             if (! verifyBallot(ballot)) return res.send("Invalid ballot");
 
-
             // Add ballot to list
             e.addBallot(ballot, signature, function(err) {
                 if (err) return next(err);
                 res.send("BALLOT_COLLECTED");
             });
         });
-
-
     });
-
-
 };
 
-counter.tempSign = function(req, res, next) {
-    console.log("counter temp sign");
-    administrator.tempSign(req.body.message, req.body.eid,  function(err, signature) {
-        res.send(signature);
-    });
-}
-
 function verifyBallot(ballot) {
-    // TODO
+    // TODO: Define what a valid ballot is here.
     return true;
 }
 
 
 counter.endElection = function(electionID) {
-
     // Stop accepting new ballots for that election
     var election = Election.getElection(electionID, function(err, election) {
         if (err) return next(err);
@@ -75,7 +62,7 @@ counter.endElection = function(electionID) {
 
 counter.viewBallots = function(req, res, next) {
     var election = req.params.eid;
-    var user = req.session.user.kerberos;
+    var user     = req.session.user.kerberos;
 
     Election.getElection(election, function(err, e){
         if (err) return next(err);
@@ -90,9 +77,6 @@ counter.viewBallots = function(req, res, next) {
         // Send back the ballots
         res.json(e.ballots);
     });
-
-
-
-}
+};
 
 module.exports = counter;

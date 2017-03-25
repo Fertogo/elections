@@ -1,18 +1,15 @@
-var express = require('express');
-var router = express.Router();
-var fs = require('fs');
+var express  = require('express');
+var router   = express.Router();
+var fs       = require('fs');
 
 var Election = require('../models/Election');
-var admin    = require('../controllers/administrator-controller')
-
+var admin    = require('../controllers/administrator-controller');
 
 
 /* GET home page. */
 router.get('/:eid', function(req, res, next) {
     var election = req.params.eid;
     var user     = req.session.user.kerberos
-
-    console.log(election);
 
     Election.getElection(election, function(err, e) {
         if (err) return next(err);
@@ -31,14 +28,9 @@ router.get('/:eid', function(req, res, next) {
             data.voters = e.voters
             data.id = e._id;
 
-
             res.render('election', {election:data});
         });
-
     });
-
 });
-
-
 
 module.exports = router;
